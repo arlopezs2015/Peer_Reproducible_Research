@@ -63,18 +63,32 @@ median(activity_na_stps_day$steps)
 mean(activity_steps$steps)
 median(activity_steps$steps)
 
-
-##activity_na$date <- as.Date(activity_na$date, "%Y-%m-%d")
+##convert to date class
 activity_na<-activity
-activity_na['date_type']<-weekdays(as.Date(activity_na$date))
-activity_na$date_type[activity_na$date_type %in% c('Saturday','Sunday') ] <- "weekend"
-activity_na$date_type[activity_na$date_type!= "weekend"] <- "weekday"
+
+activity_na$day <- weekdays(activity_na$date)
+
+##add new column
+activity_na$day_type <- c("weekday")
+
+##change saturday and sunday to weekend
+for (i in 1:nrow(activity_na))
+{
+  if (activity_na$day[i] == "Saturday" || activity_na$day[i] == "Sunday")
+{
+    activity_na$day_type[i] <- "weekend"
+}
+}
+
+##convert date time from character to factor
 activity_na$day_type <- as.factor(activity_na$day_type)
 
+##add steps as interval to get averange of steps in an interval
 intvl_steps_imputed <- aggregate(steps ~ interval+day_type, activity_na, mean)
 
-##library(ggplot2)
+library(ggplot2)
 
 ##Draw corresponding graph
 qplot(interval, steps, data=intvl_steps_imputed, type='l', geom=c("line"), xlab="Interval", 
       ylab="Number of steps", main="") + facet_wrap(~ day_type, ncol=1)
+
